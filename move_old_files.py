@@ -29,7 +29,7 @@ def move():
     for item in os.scandir(src):
         if item.stat().st_atime < deadline:
             shutil.move(item.path, prepare_name(os.path.join(dst, item.name)))
-            print("mongo: {}".format(item.path))
+            print("moved: {}".format(item.path))
 
 
 def prepare_dst_folder():

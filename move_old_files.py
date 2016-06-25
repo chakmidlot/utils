@@ -6,13 +6,15 @@ import os
 import shutil
 import sys
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 parser = argparse.ArgumentParser(description='Moves old files from one directory to another.')
 parser.add_argument('-s', '--src', required=True, help='source directory')
 parser.add_argument('-d', '--dst', required=True, help='destination directory')
 parser.add_argument('-t', '--threshold-days', type=int, required=True,  help='days since last access to file')
+parser.add_argument('-H', '--move-hidden-files', action='store_true', help='move hidden files')
+
 parser.add_argument('-V', '--version', action='version', version='Version: {}'.format(__version__))
 
 args = parser.parse_args()
@@ -21,8 +23,9 @@ args = parser.parse_args()
 src = os.path.expanduser(args.src)
 dst = os.path.expanduser(args.dst)
 
-lifetime = args.threshold_days * 24 * 3600
+move_hidden = args.move_hidden_files
 
+lifetime = args.threshold_days * 24 * 3600
 
 deadline = datetime.utcnow().timestamp() - lifetime
 
@@ -36,6 +39,9 @@ special_extensions = [
 def move():
 
     for item in os.scandir(src):
+        if not move_hidden and item.name.startswith('.'):
+            continue
+
         if item.stat().st_atime < deadline:
             shutil.move(item.path, prepare_name(os.path.join(dst, item.name)))
             print("moved: {}".format(item.path))

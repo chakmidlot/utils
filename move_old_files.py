@@ -42,7 +42,7 @@ def move():
         if not move_hidden and item.name.startswith('.'):
             continue
 
-        if item.stat().st_atime < deadline:
+        if item.stat().st_mtime < deadline:
             shutil.move(item.path, prepare_name(os.path.join(dst, item.name)))
             print("moved: {}".format(item.path))
 
